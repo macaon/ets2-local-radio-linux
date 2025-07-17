@@ -12,6 +12,12 @@ Requires the native Linux version of ETS2. It will not work with Proton.
 - **Multi-country Support**: Supports radio stations from multiple European countries
 - **Web Interface**: Modern, responsive web interface with real-time updates
 
+## Todo
+
+- **Proper signal strength use**: Everything is at 100% at the moment = purely cosmetic. I aim to have similar functionality to the original Windows version.
+- **Proper country switching**: Currently only detects nearest city. Implement log file parsing along with telemetry to figure out when borders are crossed.
+- **Controller input**: Switch channels using a controller.
+
 ## Installation
 
 1. **Clone the repository**:
