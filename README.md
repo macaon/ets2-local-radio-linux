@@ -1,42 +1,60 @@
 # ETS2 Local Radio - Linux Fork
 
-A refactored and modularized version of the ETS2 Local Radio application with real-time coordinate tracking for Linux systems.
+A Python based version of the ETS2 Local Radio application with real-time coordinate tracking for Linux systems.
+Still in development. This application does NOT have feature parity with https://github.com/Koenvh1/ets2-local-radio.
+Requires the native Linux version of ETS2. It will NOT work with Proton.
 
 ## Features
 
-- **Real-time Position Tracking**: Uses ETS2 telemetry plugin for live coordinate monitoring
-- **Location-based Radio**: Automatic station switching based on your truck's location
-- **Signal Strength Simulation**: Realistic signal strength calculation based on distance from cities
+- **Real-time Position Tracking**: Uses jackz314 ETS2 SDK plugin fork for Linux for live coordinate monitoring
+- **Location-based Radio (WIP)**: Automatic station switching based on your truck's location
+- **Signal Strength Simulation (WIP)**: Realistic signal strength calculation based on distance from cities
 - **Multi-country Support**: Supports radio stations from multiple European countries
 - **Web Interface**: Modern, responsive web interface with real-time updates
-- **Modular Architecture**: Clean, maintainable code structure
 
 ## Installation
 
 1. **Clone the repository**:
 ```bash
-git clone <repository-url>
+git clone https://github.com/macaon/ets2-local-radio-linux
 cd ets2-local-radio
 ```
 
-2. **Install Python dependencies**:
+2. **Create and activate venv**:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. **Install Python dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Install ETS2 Telemetry Plugin** (optional but recommended):
-   - Download and install the ETS2 telemetry plugin for real-time tracking
-   - Without this plugin, the application will work in manual mode
+4. **Compile and install ETS2 SDK plugin**:
+```bash
+# Clone and build the plugin
+git clone https://github.com/jackz314/scs-sdk-plugin.git
+cd scs-sdk-plugin
 
-4. **Place data files** (optional):
-   - `cities.json`: Official city database for accurate city positions
-   - `stations.json`: Custom radio station database
+# Build
+mkdir build && cd build
+cmake .. && make
+
+# Install to ETS2
+cp *.so ~/.local/share/Steam/steamapps/common/Euro\ Truck\ Simulator\ 2/bin/linux_x64/plugins/
+```
+
+5. **Download cities data**:
+   - Download cities.json from https://github.com/Koenvh1/ETS2-City-Coordinate-Retriever and place it into the base script directory.
+   (It's possible that this file is grossly outdated, but for now this is what the script is working with).
 
 ## Usage
 
 ### Running the Application
 
 ```bash
+source venv/bin/activate
 python main.py
 ```
 
@@ -53,39 +71,8 @@ You can configure the application by modifying `config.py` or using environment 
 ### Using the Web Interface
 
 1. Open `http://localhost:5000` in your browser
-2. If telemetry is connected, drive around in ETS2 to experience automatic station switching
+2. If telemetry is connected, drive around in ETS2.
 3. Manual station selection is always available regardless of telemetry status
-
-## Project Structure
-
-```
-ets2_radio/
-├── main.py                 # Application entry point
-├── config.py              # Configuration management
-├── requirements.txt       # Python dependencies
-├── README.md             # This documentation
-├── core/
-│   ├── __init__.py
-│   ├── radio_controller.py    # Main application logic
-│   └── background_monitor.py  # Background coordinate monitoring
-├── data/
-│   ├── __init__.py
-│   ├── city_database.py      # City database management
-│   └── station_manager.py    # Radio station management
-├── telemetry/
-│   ├── __init__.py
-│   └── coordinate_reader.py  # ETS2 telemetry integration
-├── web/
-│   ├── __init__.py
-│   ├── app.py              # Flask application setup
-│   ├── routes.py           # API route definitions
-│   └── templates.py        # HTML templates
-├── utils/
-│   ├── __init__.py
-│   ├── file_helpers.py     # File utilities
-│   └── math_helpers.py     # Mathematical utilities
-└── tests/                  # Unit tests (future)
-```
 
 ## Architecture
 
@@ -96,14 +83,6 @@ ets2_radio/
 - **ETS2CoordinateReader**: Telemetry plugin integration
 - **ETS2CityDatabase**: City data loading and querying
 - **StationManager**: Radio station management and parsing
-
-### Benefits of Modular Design
-
-1. **Maintainability**: Each component has a single responsibility
-2. **Testability**: Individual components can be unit tested
-3. **Extensibility**: Easy to add new features without affecting existing code
-4. **Collaboration**: Multiple developers can work on different components
-5. **Debugging**: Issues are localized to specific components
 
 ## API Endpoints
 
@@ -124,37 +103,17 @@ ets2_radio/
 3. **New web features**: Add routes to `web/routes.py`
 4. **New utilities**: Add functions to `utils/` package
 
-### Testing
-
-```bash
-# Run unit tests (when implemented)
-python -m pytest tests/
-
-# Test individual components
-python -c "from data.city_database import ETS2CityDatabase; db = ETS2CityDatabase(); print(f'Loaded {db.get_city_count()} cities')"
-```
-
-### Configuration
-
-All configuration is centralized in `config.py`. Key settings include:
-
-- File paths for data files
-- Telemetry settings
-- Signal strength calculations
-- Web server configuration
-- Country mappings
-
 ## Troubleshooting
 
 ### Common Issues
 
 1. **"ETS2 telemetry plugin not found"**
    - Install the ETS2 telemetry plugin
-   - Ensure ETS2 is running with the plugin active
+   - Ensure ETS2 is running with the plugin active (you should be notified about SDK features when launching the game)
    - Check that `/dev/shm/SCS/SCSTelemetry` exists
 
 2. **"No stations available"**
-   - Check internet connection for remote station loading
+   - Check internet connection for remote station loading (shamelessly uses https://localradio.koenvh.nl/stations/stations-europe.js)
    - Verify `stations.json` file format if using local stations
    - Try reloading stations via the web interface
 
@@ -182,10 +141,10 @@ python main.py
 
 ## License
 
-This project is based on the original ETS2 Local Radio project and enhanced for Linux systems with a modular architecture.
+This project is based on the original ETS2 Local Radio project and is being ported to Linux.
 
 ## Credits
 
 - Original ETS2 Local Radio: https://github.com/Koenvh1/ets2-local-radio/
 - Station data: https://localradio.koenvh.nl/
-- ETS2 Telemetry Plugin: Various contributors to the ETS2 modding community
+- ETS2 Telemetry Plugin: Various contributors to the ETS2 modding community (https://github.com/jackz314, https://github.com/RenCloud, https://github.com/nlhans)
