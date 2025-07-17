@@ -2,7 +2,7 @@
 
 A Python based version of the ETS2 Local Radio application with real-time coordinate tracking for Linux systems.
 Still in development. This application does NOT have feature parity with https://github.com/Koenvh1/ets2-local-radio.
-Requires the native Linux version of ETS2. It will NOT work with Proton.
+Requires the native Linux version of ETS2. It will not work with Proton.
 
 ## Features
 
