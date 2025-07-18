@@ -144,10 +144,6 @@ python main.py
 4. Add tests for new functionality
 5. Submit a pull request
 
-## License
-
-This project is based on the original ETS2 Local Radio project and is being ported to Linux.
-
 ## Credits
 
 - Original ETS2 Local Radio: https://github.com/Koenvh1/ets2-local-radio/
