@@ -7,16 +7,15 @@ Requires the native Linux version of ETS2. It will not work with Proton.
 ## Features
 
 - **Real-time Position Tracking**: Uses jackz314 ETS2 SDK plugin fork for Linux for live coordinate monitoring
-- **Location-based Radio (WIP)**: Automatic station switching based on your truck's location
-- **Signal Strength Simulation (WIP)**: Realistic signal strength calculation based on distance from cities
 - **Multi-country Support**: Supports radio stations from multiple European countries
 - **Web Interface**: Modern, responsive web interface with real-time updates
 
 ## Todo
 
-- **Proper signal strength use**: Everything is at 100% at the moment = purely cosmetic. I aim to have similar functionality to the original Windows version.
-- **Proper country switching**: Currently only detects nearest city. Implement log file parsing along with telemetry to figure out when borders are crossed.
-- **Controller input**: Switch channels using a controller.
+- **Location-based Radio**: Automatic station switching based on your truck's location
+- **Signal Strength Simulation**: Realistic signal strength calculation based on distance from cities
+- **Controller input**: Switch channels using a controller (on my wishlist but not sure this is feasible with Python/Flask)
+- **Static interference**: Interference like Koenvh1's version when signal strength is low.
 
 ## Installation
 
