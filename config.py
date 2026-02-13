@@ -25,9 +25,17 @@ class Config:
     
     # Telemetry settings
     TELEMETRY_PATH = '/dev/shm/SCS/SCSTelemetry'
-    COORDINATE_OFFSET = 2200  # Memory offset for coordinates
+    MIN_SHM_SIZE = 4305  # Minimum shared memory size to read all telemetry fields
     UPDATE_INTERVAL = 1  # Seconds between coordinate updates
     STATUS_UPDATE_INTERVAL = 2  # Seconds between status updates
+
+    # Alert thresholds
+    ALERT_COOLDOWN_SECONDS = 60
+    LOW_FUEL_THRESHOLD = 0.15  # 15% fuel remaining
+
+    # Settings file
+    SETTINGS_FILE = BASE_DIR / 'settings.json'
+    TRAVEL_LOG_DB = BASE_DIR / 'travel_log.db'
     
     # Signal strength settings
     BASE_TRANSMISSION_RANGE = 25000  # Base range in meters
