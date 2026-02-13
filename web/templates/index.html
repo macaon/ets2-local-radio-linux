@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ETS2 Truck Companion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ETS2 Truck Companion</h1>
+            <p>Linux Fork - Real-time Dashboard &amp; Radio</p>
+        </div>
+
+        <!-- Tab navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-btn" data-tab="radio">Radio</button>
+            <button class="tab-btn" data-tab="travel">Travel Log</button>
+            <button class="tab-btn" data-tab="settings">Settings</button>
+        </div>
+
+        <!-- Alert toasts -->
+        <div class="alert-toast" id="alert-toast"></div>
+
+        <!-- ==================== DASHBOARD TAB ==================== -->
+        <div class="tab-content active" id="tab-dashboard">
+            <!-- Status overview -->
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="status-value" id="tracking-mode">Loading...</div>
+                    <div class="status-label">Tracking</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="current-country">-</div>
+                    <div class="status-label">Country</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="current-city">-</div>
+                    <div class="status-label">City</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="truck-info">-</div>
+                    <div class="status-label">Truck</div>
+                </div>
+            </div>
+
+            <!-- Gauges -->
+            <div class="dashboard-grid" id="dashboard-gauges">
+                <!-- Speedometer -->
+                <div class="gauge-card">
+                    <div class="gauge-container">
+                        <div class="gauge-ring" id="speed-gauge">
+                            <div class="gauge-inner">
+                                <div class="gauge-value" id="speed-value">0</div>
+                                <div class="gauge-unit">km/h</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gauge-label">Speed</div>
+                    <div class="gauge-sublabel" id="speed-limit-text">Limit: --</div>
+                </div>
+
+                <!-- RPM -->
+                <div class="gauge-card">
+                    <div class="gauge-container">
+                        <div class="gauge-ring" id="rpm-gauge">
+                            <div class="gauge-inner">
+                                <div class="gauge-value" id="rpm-value">0</div>
+                                <div class="gauge-unit">RPM</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gauge-label">Engine RPM</div>
+                    <div class="gauge-sublabel" id="gear-text">Gear: -</div>
+                </div>
+
+                <!-- Fuel -->
+                <div class="gauge-card">
+                    <div class="gauge-container">
+                        <div class="gauge-ring" id="fuel-gauge">
+                            <div class="gauge-inner">
+                                <div class="gauge-value" id="fuel-value">0</div>
+                                <div class="gauge-unit">%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gauge-label">Fuel</div>
+                    <div class="gauge-sublabel" id="fuel-detail">-- / -- L</div>
+                </div>
+
+                <!-- Gear -->
+                <div class="gauge-card">
+                    <div class="gear-display" id="gear-display">N</div>
+                    <div class="gauge-label">Gear</div>
+                    <div class="gauge-sublabel" id="odometer-text">Odometer: --</div>
+                </div>
+            </div>
+
+            <!-- Job card -->
+            <div class="card job-card" id="job-section">
+                <h3>Current Job</h3>
+                <div id="job-content">
+                    <div class="no-job-message">No active job - pick one up at a company!</div>
+                </div>
+            </div>
+
+            <!-- Damage -->
+            <div class="card" id="damage-section">
+                <h3>Truck Condition</h3>
+                <div class="damage-grid" id="damage-grid">
+                    <div class="damage-item">
+                        <span class="damage-label">Engine</span>
+                        <div class="damage-bar-bg"><div class="damage-bar-fill" id="dmg-engine" style="width:100%"></div></div>
+                        <span class="damage-pct" id="dmg-engine-pct">100%</span>
+                    </div>
+                    <div class="damage-item">
+                        <span class="damage-label">Transmission</span>
+                        <div class="damage-bar-bg"><div class="damage-bar-fill" id="dmg-transmission" style="width:100%"></div></div>
+                        <span class="damage-pct" id="dmg-transmission-pct">100%</span>
+                    </div>
+                    <div class="damage-item">
+                        <span class="damage-label">Cabin</span>
+                        <div class="damage-bar-bg"><div class="damage-bar-fill" id="dmg-cabin" style="width:100%"></div></div>
+                        <span class="damage-pct" id="dmg-cabin-pct">100%</span>
+                    </div>
+                    <div class="damage-item">
+                        <span class="damage-label">Chassis</span>
+                        <div class="damage-bar-bg"><div class="damage-bar-fill" id="dmg-chassis" style="width:100%"></div></div>
+                        <span class="damage-pct" id="dmg-chassis-pct">100%</span>
+                    </div>
+                    <div class="damage-item">
+                        <span class="damage-label">Wheels</span>
+                        <div class="damage-bar-bg"><div class="damage-bar-fill" id="dmg-wheels" style="width:100%"></div></div>
+                        <span class="damage-pct" id="dmg-wheels-pct">100%</span>
+                    </div>
+                    <div class="damage-item">
+                        <span class="damage-label">Cargo</span>
+                        <div class="damage-bar-bg"><div class="damage-bar-fill" id="dmg-cargo" style="width:100%"></div></div>
+                        <span class="damage-pct" id="dmg-cargo-pct">100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coordinates -->
+            <div class="card" id="coordinate-display" style="display:none;">
+                <h3>Live Position</h3>
+                <div class="coordinate-grid">
+                    <div class="coordinate-item">
+                        <div class="coordinate-value" id="coord-x">-</div>
+                        <div>X</div>
+                    </div>
+                    <div class="coordinate-item">
+                        <div class="coordinate-value" id="coord-y">-</div>
+                        <div>Y</div>
+                    </div>
+                    <div class="coordinate-item">
+                        <div class="coordinate-value" id="coord-z">-</div>
+                        <div>Z</div>
+                    </div>
+                    <div class="coordinate-item">
+                        <div class="coordinate-value" id="coord-time">-</div>
+                        <div>Updated</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== RADIO TAB ==================== -->
+        <div class="tab-content" id="tab-radio">
+            <!-- Signal strength -->
+            <div class="card" id="signal-display" style="display:none;">
+                <h3>Signal Strength</h3>
+                <div class="signal-bar">
+                    <div class="signal-fill" id="signal-fill" style="width:0%"></div>
+                </div>
+                <div id="signal-text">No signal</div>
+            </div>
+
+            <!-- Player -->
+            <div class="card">
+                <h3>Radio Player</h3>
+                <div class="now-playing" id="now-playing">Select a station or drive to a city for automatic switching</div>
+                <audio id="audio-player" class="audio-player" controls preload="none">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="btn btn-warning" onclick="ETS2App.playRandomStation()">Random Station</button>
+                    <button class="btn btn-primary" onclick="ETS2App.stopRadio()">Stop</button>
+                    <button class="btn btn-success" onclick="ETS2App.refreshStatus()">Refresh</button>
+                    <button class="btn btn-success" onclick="ETS2App.reloadStations()">Reload Stations</button>
+                    <button class="btn btn-primary" id="auto-switch-btn" onclick="ETS2App.toggleAutoSwitch()">Auto-Switch: ON</button>
+                </div>
+            </div>
+
+            <div id="messages"></div>
+
+            <!-- Stations -->
+            <div class="card">
+                <h3>Available Stations</h3>
+                <div id="stations-grid" class="stations-grid">
+                    <div>Loading stations...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TRAVEL LOG TAB ==================== -->
+        <div class="tab-content" id="tab-travel">
+            <div class="travel-stats-grid" id="travel-stats">
+                <div class="travel-stat">
+                    <div class="travel-stat-value" id="stat-distance">0</div>
+                    <div class="travel-stat-label">KM Driven</div>
+                </div>
+                <div class="travel-stat">
+                    <div class="travel-stat-value" id="stat-cities">0</div>
+                    <div class="travel-stat-label">Cities Visited</div>
+                </div>
+                <div class="travel-stat">
+                    <div class="travel-stat-value" id="stat-jobs">0</div>
+                    <div class="travel-stat-label">Jobs Done</div>
+                </div>
+                <div class="travel-stat">
+                    <div class="travel-stat-value" id="stat-income">0</div>
+                    <div class="travel-stat-label">Total Income</div>
+                </div>
+                <div class="travel-stat">
+                    <div class="travel-stat-value" id="stat-fines">0</div>
+                    <div class="travel-stat-label">Total Fines</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Recent Visits</h3>
+                <div class="visit-list" id="visit-list">
+                    <div class="no-job-message">No visits recorded yet</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Job History</h3>
+                <div class="job-list" id="job-list">
+                    <div class="no-job-message">No completed jobs yet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SETTINGS TAB ==================== -->
+        <div class="tab-content" id="tab-settings">
+            <div class="card">
+                <h3>Preferences</h3>
+                <div class="settings-grid" id="settings-grid">
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Audio Alerts</div>
+                            <div class="setting-desc">Play sounds for speed, fuel, and rest warnings</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-audio-alerts" onchange="ETS2App.saveSetting('audio_alerts_enabled', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Radio Static / Interference</div>
+                            <div class="setting-desc">Add static noise based on signal strength</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-static" checked onchange="ETS2App.saveSetting('static_interference_enabled', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Auto Station Switching</div>
+                            <div class="setting-desc">Automatically tune to local stations when entering a new area</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-auto-switch" checked onchange="ETS2App.saveSetting('auto_switch_enabled', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Gamepad Support</div>
+                            <div class="setting-desc">Use gamepad D-pad for station switching and volume</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-gamepad" checked onchange="ETS2App.saveSetting('gamepad_enabled', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Dashboard Visible</div>
+                            <div class="setting-desc">Show the dashboard gauges on the main tab</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-dashboard" checked onchange="ETS2App.saveSetting('dashboard_visible', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gamepad indicator -->
+    <div class="gamepad-indicator" id="gamepad-indicator">Gamepad Connected</div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/audio.js"></script>
+    <script src="/static/js/gamepad.js"></script>
+    <script src="/static/js/travel-log.js"></script>
+</body>
+</html>

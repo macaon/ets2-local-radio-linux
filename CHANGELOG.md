@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-02-13 — Truck Companion Expansion
+
+### New Features
+
+- **Live Dashboard**: Speedometer, RPM gauge, fuel gauge, gear indicator, odometer, and truck condition bars — all rendered with CSS conic-gradient gauges
+- **Expanded Telemetry**: Reads 35+ fields from ETS2 shared memory (speed, fuel, RPM, gear, damage, job info, fines, rest stops, truck brand/name, and more)
+- **Job Tracking**: Detects job start/delivery events from telemetry; displays active job card with cargo, route, distance remaining, and income
+- **Damage Summary**: Per-component health bars for engine, transmission, cabin, chassis, wheels, and cargo
+- **Travel Log**: SQLite-backed persistent history of city visits, completed jobs, and fines with aggregate statistics
+- **Radio Static / Interference**: Web Audio API procedural white noise that crossfades with the radio stream based on signal strength, with random crackle spikes
+- **Gamepad Support**: Browser Gamepad API integration — D-pad left/right for station switching, up/down for volume, with debouncing
+- **Audible Alerts**: Optional oscillator-based tones for speeding, low fuel, rest needed, and fines (off by default)
+- **Settings Persistence**: User preferences (alerts, static, auto-switch, gamepad, dashboard) saved to `settings.json` and exposed via `/api/settings`
+- **Tabbed Web UI**: Dashboard, Radio, Travel Log, and Settings tabs replace the single-page layout
+- **Alert System**: Backend alert detection with 60-second cooldowns; frontend toast notifications
+
+### API Additions
+
+- `GET /api/telemetry` — truck state (speed, fuel, RPM, damage, job)
+- `GET /api/alerts` — consume pending alerts
+- `GET /api/travel/stats` — aggregate travel statistics
+- `GET /api/travel/recent` — recent city visits
+- `GET /api/travel/jobs` — job history
+- `GET/POST /api/settings` — user preferences
+- `GET /api/status` now includes `truck`, `job`, `damage`, and `alerts` keys
+
+### Architecture Changes
+
+- Split monolithic `web/templates.py` (785-line string constant) into proper static files: `index.html`, `main.css`, `app.js`, `dashboard.js`, `audio.js`, `gamepad.js`, `travel-log.js`
+- `BackgroundMonitor` now calls `read_telemetry()` instead of `read_coordinates()` for full telemetry polling
+- `RadioController` expanded with truck/job/damage/alerts state and event detection (job start/end, fines)
+- New modules: `data/travel_log.py` (SQLite), `data/settings.py` (JSON)
+- `config.py`: `MIN_SHM_SIZE=4305`, alert thresholds, settings/travel log paths
+
+---
+
 ## 2026-02-13
 
 ### Bug Fixes
