@@ -3,10 +3,9 @@
 City database management for ETS2 Local Radio
 """
 
-import os
-import json
-import math
 from config import Config
+from utils.math_helpers import calculate_2d_distance, calculate_signal_strength
+from utils.file_helpers import load_json_file
 
 class ETS2CityDatabase:
     """City database using the official cities.json format"""
@@ -19,24 +18,18 @@ class ETS2CityDatabase:
     
     def load_cities(self):
         """Load cities from the cities.json file"""
-        try:
-            if os.path.exists(self.cities_file):
-                with open(self.cities_file, 'r') as f:
-                    data = json.load(f)
-                    self.cities = data.get('citiesList', [])
-                    print(f"✅ Loaded cities from {self.cities_file}")
-            else:
-                print(f"⚠️ Cities file {self.cities_file} not found, using built-in data")
-                self.cities = self._get_fallback_cities()
-            
-            # Process cities and group by country
-            self._process_cities()
-            
-            print(f"✅ Processed {len(self.cities)} cities from {len(self.cities_by_country)} countries")
-            
-        except Exception as e:
-            print(f"❌ Error loading cities: {e}")
-            self.cities = []
+        data = load_json_file(self.cities_file)
+        if data:
+            self.cities = data.get('citiesList', [])
+            print(f"✅ Loaded cities from {self.cities_file}")
+        else:
+            print(f"⚠️ Cities file not available, using built-in data")
+            self.cities = self._get_fallback_cities()
+
+        # Process cities and group by country
+        self._process_cities()
+
+        print(f"✅ Processed {len(self.cities)} cities from {len(self.cities_by_country)} countries")
     
     def _process_cities(self):
         """Process city data and group by country"""
@@ -88,42 +81,23 @@ class ETS2CityDatabase:
         """Find the nearest city within transmission range"""
         nearest_city = None
         min_distance = float('inf')
-        
+
         for city in self.cities:
-            # Calculate 2D distance using X and Z coordinates (Y is altitude)
-            # In ETS2: X = east-west, Z = north-south, Y = altitude
-            distance = math.sqrt((truck_x - city['x'])**2 + (truck_z - city['z'])**2)
-            
+            distance = calculate_2d_distance(truck_x, truck_z, city['x'], city['z'])
+
             # Check if within transmission range and closer than previous
             if distance <= city['range'] and distance < min_distance:
                 min_distance = distance
                 nearest_city = city
-        
+
         return nearest_city, min_distance if nearest_city else None
-    
+
     def get_signal_strength(self, truck_x, truck_z, city):
         """Calculate signal strength based on distance"""
         if not city:
             return 0.0
-            
-        # Use X and Z coordinates for distance calculation
-        distance = math.sqrt((truck_x - city['x'])**2 + (truck_z - city['z'])**2)
-        
-        if distance >= city['range']:
-            return 0.0
-        
-        # Realistic signal strength calculation
-        normalized_distance = distance / city['range']
-        
-        # Strong signal in city center, gradual falloff
-        if normalized_distance < 0.2:
-            return 1.0  # Full signal in city center
-        elif normalized_distance < 0.5:
-            return 0.9 - (normalized_distance - 0.2) * 0.3  # Good signal
-        elif normalized_distance < 0.8:
-            return 0.6 - (normalized_distance - 0.5) * 0.5  # Moderate signal
-        else:
-            return 0.3 - (normalized_distance - 0.8) * 1.5  # Weak signal
+        distance = calculate_2d_distance(truck_x, truck_z, city['x'], city['z'])
+        return calculate_signal_strength(distance, city['range'])
     
     def get_cities_for_country(self, country):
         """Get all cities for a specific country"""

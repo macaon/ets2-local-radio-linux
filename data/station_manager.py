@@ -64,21 +64,17 @@ class StationManager:
         
         for line in lines:
             line = line.strip()
-            
+
             # Skip comments and empty lines
             if line.startswith('//') or line.startswith('/*') or not line:
                 continue
-            
+
             # Look for country definition
             country_match = re.match(r'"?(\w+)"?\s*:\s*\[', line)
             if country_match:
                 # Save previous country if we have one
-                if current_country and current_stations:
-                    country_name = Config.COUNTRY_MAPPING.get(current_country.lower(), current_country.lower())
-                    if country_name and current_country != 'christmas':
-                        processed_stations[country_name] = current_stations
-                        print(f"📻 Processed {len(current_stations)} stations for {current_country} -> {country_name}")
-                
+                self._flush_country(current_country, current_stations, processed_stations)
+
                 # Start new country
                 current_country = country_match.group(1)
                 current_stations = []
@@ -131,11 +127,7 @@ class StationManager:
                     continue
         
         # Don't forget the last country
-        if current_country and current_stations:
-            country_name = Config.COUNTRY_MAPPING.get(current_country.lower(), current_country.lower())
-            if country_name and current_country != 'christmas':
-                processed_stations[country_name] = current_stations
-                print(f"📻 Processed {len(current_stations)} stations for {current_country} -> {country_name}")
+        self._flush_country(current_country, current_stations, processed_stations)
         
         if processed_stations:
             self.stations = processed_stations
@@ -146,6 +138,14 @@ class StationManager:
             print("⚠️ No stations found in remote source, using fallback")
             self._create_fallback_stations()
     
+    def _flush_country(self, country, stations, processed_stations):
+        """Save accumulated stations for a country into processed_stations"""
+        if country and stations:
+            country_name = Config.COUNTRY_MAPPING.get(country.lower(), country.lower())
+            if country_name and country != 'christmas':
+                processed_stations[country_name] = stations
+                print(f"📻 Processed {len(stations)} stations for {country} -> {country_name}")
+
     def _is_valid_station(self, station):
         """Check if a station has required fields and is not a placeholder"""
         if not isinstance(station, dict):

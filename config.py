@@ -66,6 +66,21 @@ class Config:
     MAJOR_CITIES = [
         'london', 'paris', 'berlin', 'madrid', 'rome', 'warsaw', 'prague'
     ]
+
+    # Large cities - next tier below major
+    LARGE_CITIES = [
+        'oslo', 'stockholm', 'copenhagen', 'helsinki', 'vienna', 'brussels',
+        'amsterdam', 'zurich', 'munich', 'hamburg', 'frankfurt', 'cologne',
+        'lyon', 'marseille', 'barcelona', 'lisbon', 'milan', 'naples',
+        'budapest', 'bucharest', 'sofia', 'athens', 'istanbul', 'dublin',
+        'edinburgh', 'manchester', 'birmingham', 'glasgow', 'liverpool',
+        'rotterdam', 'antwerp', 'gothenburg', 'malmo', 'bergen', 'krakow',
+        'gdansk', 'wroclaw', 'poznan', 'bratislava', 'vilnius', 'riga',
+        'tallinn', 'minsk', 'kyiv', 'zagreb', 'belgrade', 'stuttgart',
+        'dortmund', 'dusseldorf', 'hannover', 'nuremberg', 'leipzig',
+        'dresden', 'bremen', 'duisburg', 'essen', 'genoa', 'turin',
+        'seville', 'valencia', 'porto', 'thessaloniki'
+    ]
     
     @classmethod
     def get_cities_file_path(cls):
@@ -84,7 +99,7 @@ class Config:
         
         if any(major in city_name_lower for major in cls.MAJOR_CITIES):
             return cls.BASE_TRANSMISSION_RANGE * cls.MAJOR_CITY_MULTIPLIER
-        elif len(city_name) > 8:
+        elif any(large in city_name_lower for large in cls.LARGE_CITIES):
             return cls.BASE_TRANSMISSION_RANGE * cls.LARGE_CITY_MULTIPLIER
         else:
             return cls.BASE_TRANSMISSION_RANGE * cls.SMALL_CITY_MULTIPLIER

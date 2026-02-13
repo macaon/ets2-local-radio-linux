@@ -3,6 +3,7 @@
 Flask application setup for ETS2 Local Radio
 """
 
+import os
 from flask import Flask
 from flask_cors import CORS
 from config import Config
@@ -15,7 +16,7 @@ def create_app(radio_controller):
     
     # Configure Flask app
     app.config.update(
-        SECRET_KEY='ets2-local-radio-secret-key',
+        SECRET_KEY=os.urandom(24).hex(),
         DEBUG=Config.DEBUG
     )
     

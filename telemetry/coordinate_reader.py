@@ -24,6 +24,11 @@ class ETS2CoordinateReader:
             if os.path.exists(self.shm_path):
                 self.shm_fd = os.open(self.shm_path, os.O_RDONLY)
                 self.mm = mmap.mmap(self.shm_fd, 0, access=mmap.ACCESS_READ)
+                min_size = Config.COORDINATE_OFFSET + 24  # 3 doubles = 24 bytes
+                if self.mm.size() < min_size:
+                    print(f"❌ Shared memory too small ({self.mm.size()} bytes, need {min_size})")
+                    self.disconnect()
+                    return False
                 self.connected = True
                 print("✅ Connected to ETS2 telemetry plugin")
                 return True
@@ -41,7 +46,6 @@ class ETS2CoordinateReader:
             
         try:
             # Read coordinates from shared memory at configured offset
-            self.mm.seek(Config.COORDINATE_OFFSET)
             x, y, z = struct.unpack_from('<ddd', self.mm, Config.COORDINATE_OFFSET)
             
             # Use the corrected coordinate system (no conversion needed)
